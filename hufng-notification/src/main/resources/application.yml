@@ -1,0 +1,54 @@
+server:
+  port: 8082
+  servlet:
+    context-path: /notification/api
+
+spring:
+  application:
+    name: hufng-notification
+  datasource:
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/${MYSQL_DB:hufng_iot}?createDatabaseIfNotExist=true&characterEncoding=utf8&serverTimezone=Asia/Ho_Chi_Minh
+    username: ${MYSQL_USER:root}
+    password: ${MYSQL_PASSWORD:Root@123}
+  jpa:
+    hibernate:
+      ddl-auto: update # dev only; see docs/brainstorm/iot_todo.md section 1 (processed_event)
+    open-in-view: false
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: hufng-notification
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: com.hufng.notification.dto
+        spring.json.value.default.type: com.hufng.notification.dto.ResourceAlertMessage
+        spring.json.use.type.headers: false
+    listener:
+      ack-mode: manual_immediate
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka}
+  instance:
+    prefer-ip-address: true
+
+telegram:
+  bot:
+    token: ${TELEGRAM_BOT_TOKEN:}
+  chat:
+    id: ${TELEGRAM_CHAT_ID:}
+
+notification:
+  telegram:
+    enabled: true
+  discord:
+    enabled: false
+    webhook-url: ${DISCORD_WEBHOOK_URL:}
+
+logging:
+  level:
+    com.netflix.discovery: WARN

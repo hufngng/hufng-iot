@@ -1,0 +1,27 @@
+# No Eureka server running in tests — disable client registration/discovery
+# entirely instead of letting it retry against the default localhost:8761.
+eureka:
+  client:
+    enabled: false
+
+# TelegramService requires bot.token/chat.id with no defaults; disable it here
+# so a context-load test doesn't fail resolving those placeholders.
+notification:
+  telegram:
+    enabled: false
+
+# No Kafka broker running in tests — don't let listener containers try to
+# connect/retry against the default bootstrap-servers on context load.
+# No MySQL running in tests — H2 in MySQL mode, same pattern as hufng-auth.
+spring:
+  kafka:
+    listener:
+      auto-startup: false
+  datasource:
+    url: jdbc:h2:mem:testdb;MODE=MySQL;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop

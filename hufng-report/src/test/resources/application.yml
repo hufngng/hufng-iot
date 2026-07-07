@@ -1,0 +1,21 @@
+# No ClickHouse running in tests — exclude datasource autoconfig entirely
+# rather than pointing at a fake URL (Hikari validates the connection at
+# startup and would fail context load).
+spring:
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+  kafka:
+    listener:
+      auto-startup: false
+
+report:
+  alert-rules:
+    - metric: temperature
+      threshold: 30
+      channel: TELEGRAM
+
+# No Eureka server running in tests — disable client registration/discovery
+# entirely instead of letting it retry against the default localhost:8761.
+eureka:
+  client:
+    enabled: false
