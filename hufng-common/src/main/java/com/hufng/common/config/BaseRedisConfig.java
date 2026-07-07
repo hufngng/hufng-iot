@@ -45,9 +45,13 @@ public class BaseRedisConfig {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
         // Must be set; otherwise JSON cannot be converted to objects and will be
-        // deserialized as Map type
+        // deserialized as Map type. EVERYTHING (not NON_FINAL) is required because
+        // the declared value type here is always Object.class -- NON_FINAL skips
+        // writing type info for final classes (e.g. Java records), but the reader
+        // still expects a type wrapper for an Object-typed field, so any cached
+        // record would serialize without a wrapper and fail to deserialize.
         objectMapper.activateDefaultTyping(LaissezFaireSubTypeValidator.instance,
-                ObjectMapper.DefaultTyping.NON_FINAL);
+                ObjectMapper.DefaultTyping.EVERYTHING);
         // This ObjectMapper is built manually (new ObjectMapper()), so it doesn't
         // get Spring Boot's autoconfigured Jackson modules — java.time types
         // (LocalDateTime etc.) fail to serialize without this registered explicitly.

@@ -57,7 +57,17 @@ public class DeviceAuthService {
     }
 
     private DeviceCacheEntry loadCacheEntry(String deviceId) {
-        Object cached = redisService.get(cacheKey(deviceId));
+        Object cached;
+        try {
+            cached = redisService.get(cacheKey(deviceId));
+        } catch (Exception e) {
+            // A cache entry that fails to deserialize (e.g. left over from a
+            // different serializer config) must not crash message processing —
+            // treat it like a miss and let the DB reload/re-cache it below.
+            log.warn("Failed to read device cache entry, treating as cache miss: deviceId={}", deviceId, e);
+            redisService.del(cacheKey(deviceId));
+            cached = null;
+        }
         if (cached instanceof DeviceCacheEntry entry) {
             return entry;
         }

@@ -59,6 +59,20 @@ class DeviceAuthServiceTest {
     }
 
     @Test
+    void authenticate_corruptCacheEntry_fallsBackToDbInsteadOfThrowing() {
+        when(redisService.get("device:sensor-1"))
+                .thenThrow(new org.springframework.data.redis.serializer.SerializationException("bad payload"));
+        when(deviceRepository.findById("sensor-1"))
+                .thenReturn(Optional.of(new Device("sensor-1", 1L, "s1", "hashed", DeviceStatus.ACTIVE, "DHT22", Instant.now(), null)));
+        when(passwordEncoder.matches("secret", "hashed")).thenReturn(true);
+
+        DeviceAuthResult result = deviceAuthService.authenticate("sensor-1", "secret");
+
+        assertThat(result).isEqualTo(DeviceAuthResult.OK);
+        verify(redisService).del("device:sensor-1");
+    }
+
+    @Test
     void authenticate_secretMismatch_returnsAuthMismatch() {
         when(redisService.get("device:sensor-1"))
                 .thenReturn(new DeviceCacheEntry("sensor-1", DeviceStatus.ACTIVE, "hashed"));

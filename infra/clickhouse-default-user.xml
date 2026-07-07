@@ -1,0 +1,14 @@
+<clickhouse>
+  <!-- Overrides the image's baked-in users.d/default-user.xml, which
+       restricts the default user to 127.0.0.1/::1 only. hufng-report
+       connects as default (no password) from a separate container, so
+       that restriction breaks the whole pipeline. Dev-only, matches the
+       EMQX_ALLOW_ANONYMOUS=true tradeoff already made for mqtt below. -->
+  <users>
+    <default>
+      <networks>
+        <ip>::/0</ip>
+      </networks>
+    </default>
+  </users>
+</clickhouse>

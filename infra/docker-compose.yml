@@ -19,15 +19,18 @@ services:
       - "18083:18083" # EMQX dashboard
 
   # Time-series store for telemetry -- append-only, columnar, TTL drops old
-  # chunks instead of row-by-row deletes.
+  # chunks instead of row-by-row deletes. Pinned to an LTS release (not
+  # :latest) -- clickhouse-jdbc 0.6.5's LZ4 framing breaks against newer
+  # server protocol versions ("Magic is not correct" on every query).
   clickhouse:
-    image: clickhouse/clickhouse-server:latest
+    image: clickhouse/clickhouse-server:24.8
     container_name: hufng-iot-clickhouse
     ports:
       - "8123:8123" # HTTP/JDBC
       - "9000:9000" # native protocol
     volumes:
       - ./init-clickhouse.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - ./clickhouse-default-user.xml:/etc/clickhouse-server/users.d/default-user.xml:ro
     environment:
       CLICKHOUSE_DB: default
 
@@ -70,6 +73,20 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
+
+  # Web UI for browsing topics/messages/consumer groups on the kafka
+  # service above — talks to it over the internal compose network.
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: hufng-iot-kafka-ui
+    ports:
+      - "8090:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: hufng-iot
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+    depends_on:
+      kafka:
+        condition: service_started
 
   hufng-ingest:
     build:
