@@ -6,7 +6,6 @@ import com.hufng.ingest.entity.Device;
 import com.hufng.ingest.enums.DeviceStatus;
 import com.hufng.ingest.repository.DeviceRepository;
 import com.hufng.ingest.service.DeviceAuthService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,12 +19,19 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/v1/devices")
-@RequiredArgsConstructor
 public class DeviceRegistrationController {
 
     private final DeviceRepository deviceRepository;
     private final DeviceAuthService deviceAuthService;
     private final PasswordEncoder passwordEncoder;
+
+    public DeviceRegistrationController(DeviceRepository deviceRepository,
+                                         DeviceAuthService deviceAuthService,
+                                         PasswordEncoder passwordEncoder) {
+        this.deviceRepository = deviceRepository;
+        this.deviceAuthService = deviceAuthService;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)

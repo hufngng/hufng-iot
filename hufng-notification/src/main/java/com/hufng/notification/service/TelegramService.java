@@ -1,7 +1,7 @@
 package com.hufng.notification.service;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.*;
@@ -15,12 +15,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Slf4j
 @Service
-@RequiredArgsConstructor
 @ConditionalOnProperty(name = "notification.telegram.enabled", havingValue = "true", matchIfMissing = true)
 public class TelegramService implements NotificationService {
 
+    private static final Logger log = LoggerFactory.getLogger(TelegramService.class);
     private static final String TELEGRAM_API = "https://api.telegram.org/bot%s/sendMessage";
     private static final int MAX_LENGTH = 4096;
     private static final int MAX_RETRIES = 3;
@@ -33,6 +32,10 @@ public class TelegramService implements NotificationService {
     private String chatId;
 
     private final RestTemplate restTemplate;
+
+    public TelegramService(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
 
     @Override
     public NotificationChannel channel() {

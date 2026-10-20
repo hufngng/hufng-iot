@@ -5,8 +5,8 @@ import com.hufng.ingest.dto.DeviceTelemetryMessage;
 import com.hufng.ingest.dto.DeviceTelemetryPayload;
 import com.hufng.ingest.service.DeviceAuthResult;
 import com.hufng.ingest.service.DeviceAuthService;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Component;
@@ -19,14 +19,21 @@ import java.time.Instant;
  * MQTT QoS 1 has already delivered it, we just choose not to forward it, we never
  * throw back into the Paho adapter.
  */
-@Slf4j
 @Component
-@RequiredArgsConstructor
 public class TelemetryIngestHandler {
+
+    private static final Logger log = LoggerFactory.getLogger(TelemetryIngestHandler.class);
 
     private final ObjectMapper objectMapper;
     private final DeviceAuthService deviceAuthService;
     private final KafkaTemplate<String, DeviceTelemetryMessage> kafkaTemplate;
+
+    public TelemetryIngestHandler(ObjectMapper objectMapper, DeviceAuthService deviceAuthService,
+                                   KafkaTemplate<String, DeviceTelemetryMessage> kafkaTemplate) {
+        this.objectMapper = objectMapper;
+        this.deviceAuthService = deviceAuthService;
+        this.kafkaTemplate = kafkaTemplate;
+    }
 
     public void handle(Message<?> message) {
         String body = String.valueOf(message.getPayload());

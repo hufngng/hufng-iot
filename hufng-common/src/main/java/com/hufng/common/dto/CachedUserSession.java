@@ -1,9 +1,5 @@
 package com.hufng.common.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 /**
  * Minimal snapshot of a logged-in user, cached in Redis keyed by JWT token
  * (see AuthConstant.buildUserLoginKey). Deliberately NOT the full JPA entity
@@ -18,9 +14,6 @@ import lombok.NoArgsConstructor;
  * final), so a record would deserialize back as a raw LinkedHashMap instead
  * of this type.
  */
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class CachedUserSession {
     private Long userId;
     private String username;
@@ -35,4 +28,46 @@ public class CachedUserSession {
      * README, "1 vấn đề đối với oauth2 là khi user revoke quyền").
      */
     private Long loginAt;
+
+    public CachedUserSession() {
+    }
+
+    public CachedUserSession(Long userId, String username, String role, Long loginAt) {
+        this.userId = userId;
+        this.username = username;
+        this.role = role;
+        this.loginAt = loginAt;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    public Long getLoginAt() {
+        return loginAt;
+    }
+
+    public void setLoginAt(Long loginAt) {
+        this.loginAt = loginAt;
+    }
 }

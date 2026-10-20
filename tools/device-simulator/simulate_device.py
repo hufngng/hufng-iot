@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Simulates an IoT device publishing telemetry over MQTT.
 
-Not part of the Maven build -- a standalone demo tool, for when there's no
+Not part of the Gradle build -- a standalone demo tool, for when there's no
 real hardware to test against. Requires `paho-mqtt` (`pip install paho-mqtt`);
 everything else is Python stdlib.
 

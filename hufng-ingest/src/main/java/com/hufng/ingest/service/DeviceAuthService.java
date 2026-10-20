@@ -5,8 +5,8 @@ import com.hufng.ingest.dto.DeviceCacheEntry;
 import com.hufng.ingest.entity.Device;
 import com.hufng.ingest.enums.DeviceStatus;
 import com.hufng.ingest.repository.DeviceRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -17,10 +17,10 @@ import java.time.Instant;
  * N x throughput, so an ACTIVE device's (status, secretHash) projection is
  * cached in Redis for 1h; revoke = update DB + evict cache.
  */
-@Slf4j
 @Service
-@RequiredArgsConstructor
 public class DeviceAuthService {
+
+    private static final Logger log = LoggerFactory.getLogger(DeviceAuthService.class);
 
     private static final long CACHE_TTL_SECONDS = 3600;
     private static final String CACHE_KEY_PREFIX = "device:";
@@ -28,6 +28,13 @@ public class DeviceAuthService {
     private final DeviceRepository deviceRepository;
     private final RedisService redisService;
     private final PasswordEncoder passwordEncoder;
+
+    public DeviceAuthService(DeviceRepository deviceRepository, RedisService redisService,
+                              PasswordEncoder passwordEncoder) {
+        this.deviceRepository = deviceRepository;
+        this.redisService = redisService;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     public DeviceAuthResult authenticate(String deviceId, String authToken) {
         DeviceCacheEntry entry = loadCacheEntry(deviceId);

@@ -1,7 +1,7 @@
 # hufng-iot
 
-IoT ingestion pipeline — Maven multi-module reactor, Spring Boot 3.3.4 on Java
-21. Independent reactor (not a submodule of `hufng-pet`); `hufng-common` is
+IoT ingestion pipeline — Gradle (Kotlin DSL) multi-project build, Spring Boot 3.3.4
+on Java 21. Independent build (not a submodule of `hufng-pet`); `hufng-common` is
 copied in rather than depended on, so this repo builds and runs on its own.
 
 End-to-end story: a device publishes telemetry over MQTT, ingest authenticates
@@ -38,8 +38,8 @@ hufng-notification :8082    dedupe processed_event (MySQL, exact) → Telegram/D
 | `hufng-ingest` | MQTT bridge — device registry/auth (MySQL `device` table + Redis cache), subscribes MQTT shared subscription, produces `DEVICE_TELEMETRY`. Also exposes `POST /v1/devices/register`. |
 | `hufng-report` | Consumes `DEVICE_TELEMETRY`, writes to ClickHouse (`telemetry` table), checks alert rules (config-based), produces `RESOURCE_ALERT`. |
 | `hufng-notification` | Consumes `RESOURCE_ALERT`, dedupes exactly via MySQL `processed_event` (INSERT-first), routes to Telegram/Discord. |
-| `infra/` | Not a Maven module — Docker Compose for the whole stack: Eureka, EMQX (MQTT), ClickHouse, MySQL, Redis, Kafka (single-node KRaft), and the 3 app services (each built from its own multi-stage `Dockerfile`). |
-| `tools/device-simulator/` | Python script (not part of the Maven build) simulating one or more devices publishing telemetry over MQTT — can self-register against `hufng-ingest`, no real hardware needed. |
+| `infra/` | Not a Gradle subproject — Docker Compose for the whole stack: Eureka, EMQX (MQTT), ClickHouse, MySQL, Redis, Kafka (single-node KRaft), and the 3 app services (each built from its own multi-stage `Dockerfile`). |
+| `tools/device-simulator/` | Python script (not part of the Gradle build) simulating one or more devices publishing telemetry over MQTT — can self-register against `hufng-ingest`, no real hardware needed. |
 
 ## Ports
 
@@ -66,11 +66,13 @@ hufng-notification :8082    dedupe processed_event (MySQL, exact) → Telegram/D
 ## Common commands
 
 ```bash
+# Requires JDK 21 as JAVA_HOME; ./gradlew pins Gradle 8.6
 # Build everything
-mvn clean install
+./gradlew build
 
 # Test (no Docker/broker needed — H2 + auto-startup/eureka disabled in test yml)
-mvn test
+./gradlew test
+./gradlew :hufng-notification:test --tests ProcessedEventServiceTest   # single class
 
 # Whole stack in Docker: eureka, mqtt (EMQX), clickhouse, mysql, redis, kafka,
 # and the 3 app services (each built from its own Dockerfile). Optionally
@@ -78,13 +80,12 @@ mvn test
 # you want real alerts delivered.
 cd infra && docker compose up --build -d
 
-# Or run services locally against Docker-only infra (mvn spring-boot:run
+# Or run services locally against Docker-only infra (gradle bootRun
 # instead of the app containers above): comment out the 3 app services in
 # infra/docker-compose.yml, `docker compose up -d` the rest, then:
-mvn install -DskipTests
-mvn -pl hufng-ingest spring-boot:run       # don't use -am with spring-boot:run
-mvn -pl hufng-report spring-boot:run
-mvn -pl hufng-notification spring-boot:run
+./gradlew :hufng-ingest:bootRun       # one service per terminal
+./gradlew :hufng-report:bootRun
+./gradlew :hufng-notification:bootRun
 ```
 
 ## Demo end-to-end (no real device needed)

@@ -12,6 +12,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class HufngReportApplication {
 
     public static void main(String[] args) {
+        boolean a = false;
+        if (a) System.out.println("hungtest");
         SpringApplication.run(HufngReportApplication.class, args);
     }
 }

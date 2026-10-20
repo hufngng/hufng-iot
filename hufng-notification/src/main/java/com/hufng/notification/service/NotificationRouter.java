@@ -1,18 +1,22 @@
 package com.hufng.notification.service;
 
 import com.hufng.notification.enums.NotificationChannel;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Slf4j
 @Service
-@RequiredArgsConstructor
 public class NotificationRouter {
 
+    private static final Logger log = LoggerFactory.getLogger(NotificationRouter.class);
+
     private final List<NotificationService> services;
+
+    public NotificationRouter(List<NotificationService> services) {
+        this.services = services;
+    }
 
     public void send(String message) {
         send(NotificationChannel.ALL, message);

@@ -17,21 +17,21 @@ jobs:
         with:
           distribution: temurin
           java-version: "21"
-          cache: maven
+          cache: gradle
 
       # No Docker/broker needed: H2 replaces MySQL, mqtt.enabled/eureka.client.enabled/
       # kafka listener auto-startup are all disabled in each module's test application.yml
       # (see CLAUDE.md), and hufng-report's test yml excludes DataSourceAutoConfiguration
       # since there's no fake-but-connectable ClickHouse substitute.
       - name: Run tests
-        run: mvn -B clean test
+        run: ./gradlew --no-daemon clean test
 
-      - name: Upload surefire reports on failure
+      - name: Upload test reports on failure
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: surefire-reports
-          path: "**/target/surefire-reports/*"
+          name: test-reports
+          path: "**/build/reports/tests/test/**"
 
   docker-build:
     runs-on: ubuntu-latest
@@ -43,7 +43,8 @@ jobs:
       - uses: actions/checkout@v4
 
       # Each service's Dockerfile builds against the whole repo as context
-      # (see CLAUDE.md) — the root reactor pom needs every module's pom.xml
-      # readable even when only one module + hufng-common gets compiled.
+      # (see CLAUDE.md) — settings.gradle.kts includes every module, so each
+      # module's build.gradle.kts must be readable even when only one module +
+      # hufng-common gets compiled.
       - name: Build ${{ matrix.service }} image
         run: docker build -f ${{ matrix.service }}/Dockerfile -t hufng-iot/${{ matrix.service }}:ci .

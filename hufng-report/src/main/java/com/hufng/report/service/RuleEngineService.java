@@ -5,8 +5,8 @@ import com.hufng.report.dto.AlertRule;
 import com.hufng.report.dto.DeviceTelemetryMessage;
 import com.hufng.report.dto.ResourceAlertMessage;
 import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -14,15 +14,21 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-@Slf4j
 @Service
-@RequiredArgsConstructor
 public class RuleEngineService {
+
+    private static final Logger log = LoggerFactory.getLogger(RuleEngineService.class);
 
     private final AlertRuleProperties alertRuleProperties;
     private final KafkaTemplate<String, ResourceAlertMessage> kafkaTemplate;
 
     private Map<String, AlertRule> rulesByMetric;
+
+    public RuleEngineService(AlertRuleProperties alertRuleProperties,
+                              KafkaTemplate<String, ResourceAlertMessage> kafkaTemplate) {
+        this.alertRuleProperties = alertRuleProperties;
+        this.kafkaTemplate = kafkaTemplate;
+    }
 
     @PostConstruct
     void loadRules() {

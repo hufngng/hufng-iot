@@ -2,8 +2,8 @@ package com.hufng.notification.service;
 
 import com.hufng.notification.entity.ProcessedEvent;
 import com.hufng.notification.repository.ProcessedEventRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -18,14 +18,17 @@ import java.time.Instant;
  * a check-then-act approach (race window). Inserting immediately and catching
  * the PK violation lets the DB constraint act as the single arbiter.
  */
-@Slf4j
 @Service
-@RequiredArgsConstructor
 public class ProcessedEventService {
 
+    private static final Logger log = LoggerFactory.getLogger(ProcessedEventService.class);
     private static final Duration RETENTION = Duration.ofDays(7);
 
     private final ProcessedEventRepository processedEventRepository;
+
+    public ProcessedEventService(ProcessedEventRepository processedEventRepository) {
+        this.processedEventRepository = processedEventRepository;
+    }
 
     /** @return true if this is the first time (event_id, consumer) is seen; false if it's a duplicate. */
     @Transactional

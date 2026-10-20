@@ -7,19 +7,11 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.time.Instant;
 
 @Entity
 @Table(name = "device")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
 public class Device {
 
     @Id
@@ -47,4 +39,83 @@ public class Device {
 
     @Column(name = "last_seen_at")
     private Instant lastSeenAt;
+
+    public Device() {
+    }
+
+    public Device(String deviceId, Long ownerId, String deviceName, String deviceSecretHash,
+                  DeviceStatus status, String model, Instant createdAt, Instant lastSeenAt) {
+        this.deviceId = deviceId;
+        this.ownerId = ownerId;
+        this.deviceName = deviceName;
+        this.deviceSecretHash = deviceSecretHash;
+        this.status = status;
+        this.model = model;
+        this.createdAt = createdAt;
+        this.lastSeenAt = lastSeenAt;
+    }
+
+    public String getDeviceId() {
+        return deviceId;
+    }
+
+    public void setDeviceId(String deviceId) {
+        this.deviceId = deviceId;
+    }
+
+    public Long getOwnerId() {
+        return ownerId;
+    }
+
+    public void setOwnerId(Long ownerId) {
+        this.ownerId = ownerId;
+    }
+
+    public String getDeviceName() {
+        return deviceName;
+    }
+
+    public void setDeviceName(String deviceName) {
+        this.deviceName = deviceName;
+    }
+
+    public String getDeviceSecretHash() {
+        return deviceSecretHash;
+    }
+
+    public void setDeviceSecretHash(String deviceSecretHash) {
+        this.deviceSecretHash = deviceSecretHash;
+    }
+
+    public DeviceStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(DeviceStatus status) {
+        this.status = status;
+    }
+
+    public String getModel() {
+        return model;
+    }
+
+    public void setModel(String model) {
+        this.model = model;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Instant getLastSeenAt() {
+        return lastSeenAt;
+    }
+
+    public void setLastSeenAt(Instant lastSeenAt) {
+        this.lastSeenAt = lastSeenAt;
+    }
 }

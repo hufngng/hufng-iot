@@ -6,10 +6,6 @@ import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.springframework.data.domain.Persistable;
 
 import java.io.Serializable;
@@ -31,10 +27,6 @@ import java.util.Objects;
  */
 @Entity
 @Table(name = "processed_event")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
 public class ProcessedEvent implements Persistable<ProcessedEvent.Id> {
 
     @EmbeddedId
@@ -43,8 +35,27 @@ public class ProcessedEvent implements Persistable<ProcessedEvent.Id> {
     @Column(name = "processed_at", nullable = false)
     private Instant processedAt;
 
+    public ProcessedEvent() {
+    }
+
     public ProcessedEvent(String eventId, String consumer, Instant processedAt) {
         this.id = new Id(eventId, consumer);
+        this.processedAt = processedAt;
+    }
+
+    public Id getId() {
+        return id;
+    }
+
+    public void setId(Id id) {
+        this.id = id;
+    }
+
+    public Instant getProcessedAt() {
+        return processedAt;
+    }
+
+    public void setProcessedAt(Instant processedAt) {
         this.processedAt = processedAt;
     }
 
@@ -55,10 +66,6 @@ public class ProcessedEvent implements Persistable<ProcessedEvent.Id> {
     }
 
     @Embeddable
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    @AllArgsConstructor
     public static class Id implements Serializable {
 
         @Column(name = "event_id", length = 64)
@@ -66,6 +73,30 @@ public class ProcessedEvent implements Persistable<ProcessedEvent.Id> {
 
         @Column(name = "consumer", length = 64)
         private String consumer;
+
+        public Id() {
+        }
+
+        public Id(String eventId, String consumer) {
+            this.eventId = eventId;
+            this.consumer = consumer;
+        }
+
+        public String getEventId() {
+            return eventId;
+        }
+
+        public void setEventId(String eventId) {
+            this.eventId = eventId;
+        }
+
+        public String getConsumer() {
+            return consumer;
+        }
+
+        public void setConsumer(String consumer) {
+            this.consumer = consumer;
+        }
 
         @Override
         public boolean equals(Object o) {

@@ -1,7 +1,7 @@
 package com.hufng.notification.service;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.*;
@@ -14,18 +14,21 @@ import com.hufng.notification.util.MessageUtil;
 import java.util.List;
 import java.util.Map;
 
-@Slf4j
 @Service
-@RequiredArgsConstructor
 @ConditionalOnProperty(name = "notification.discord.enabled", havingValue = "true")
 public class DiscordService implements NotificationService {
 
+    private static final Logger log = LoggerFactory.getLogger(DiscordService.class);
     private static final int MAX_LENGTH = 2000;
 
     @Value("${notification.discord.webhook-url}")
     private String webhookUrl;
 
     private final RestTemplate restTemplate;
+
+    public DiscordService(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
 
     @Override
     public NotificationChannel channel() {

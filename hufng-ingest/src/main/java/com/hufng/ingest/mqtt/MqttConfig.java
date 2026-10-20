@@ -18,7 +18,7 @@ import org.springframework.messaging.MessageHandler;
  * the MQTT equivalent of a Kafka consumer group. QoS 1 matches the device's own
  * at-least-once retry behaviour (dedupe happens downstream via device-supplied seq).
  *
- * Gated by mqtt.enabled so `mvn test` never needs a real broker.
+ * Gated by mqtt.enabled so `./gradlew test` never needs a real broker.
  */
 @Configuration
 @ConditionalOnProperty(name = "mqtt.enabled", matchIfMissing = true)

@@ -3,8 +3,6 @@ package com.hufng.notification.consumer;
 import com.hufng.notification.dto.ResourceAlertMessage;
 import com.hufng.notification.service.NotificationRouter;
 import com.hufng.notification.service.ProcessedEventService;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Component;
@@ -15,15 +13,19 @@ import org.springframework.stereotype.Component;
  * side-effect (Telegram/Discord call), which can't itself be made
  * transactional with the DB write.
  */
-@Slf4j
 @Component
-@RequiredArgsConstructor
 public class ResourceAlertConsumer {
 
     private static final String CONSUMER_NAME = "hufng-notification";
 
     private final NotificationRouter notificationRouter;
     private final ProcessedEventService processedEventService;
+
+    public ResourceAlertConsumer(NotificationRouter notificationRouter,
+                                  ProcessedEventService processedEventService) {
+        this.notificationRouter = notificationRouter;
+        this.processedEventService = processedEventService;
+    }
 
     @KafkaListener(topics = "RESOURCE_ALERT", groupId = "hufng-notification")
     public void consume(ResourceAlertMessage alert, Acknowledgment ack) {
